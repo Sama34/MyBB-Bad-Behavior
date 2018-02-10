@@ -562,8 +562,8 @@ function badbehavior_is_installed()
 {
 	global $db;
 
-	$query = $db->simple_select("settinggroups", "COUNT(*) as rows", "name = 'badbehavior'");
-	$bbcnt = $db->fetch_field($query, "rows");
+	$query = $db->simple_select("settinggroups", "COUNT(*) as is_instaled", "name = 'badbehavior'");
+	$bbcnt = $db->fetch_field($query, "is_instaled");
 
 	if($bbcnt == 1)
 	{
