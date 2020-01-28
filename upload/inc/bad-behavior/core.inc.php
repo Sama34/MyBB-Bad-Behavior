@@ -1,12 +1,11 @@
 <?php if (!defined('BB2_CWD')) die("I said no cheating!");
-define('BB2_VERSION', "2.2.14");
+define('BB2_VERSION', "2.2.24");
 
 // Bad Behavior entry point is bb2_start()
 // If you're reading this, you are probably lost.
 // Go read the bad-behavior-generic.php file.
 
 define('BB2_CORE', dirname(__FILE__));
-define('BB2_COOKIE', 'bb2_screener_');
 
 require_once(BB2_CORE . "/functions.inc.php");
 
@@ -68,6 +67,19 @@ function bb2_reverse_proxy($settings, $headers_mixed)
 	return false;
 }
 
+# FIXME: Bug #12. But this code doesn't currently work.
+function bb2_unpack_php_post_array($key, $value)
+{
+	$unpacked = array();
+	foreach ($value as $k => $v) {
+		$i = $key. '[' . $k . ']';
+		if (is_array($v))
+			$v = bb2_unpack_php_post_array($i, $v);
+		$unpacked[$i] = $v;
+	}
+	return $unpacked;
+}
+
 // Let God sort 'em out!
 function bb2_start($settings)
 {
@@ -85,8 +97,12 @@ function bb2_start($settings)
 
 	// Reconstruct the HTTP entity, if present.
 	$request_entity = array();
-	if (!strcasecmp($_SERVER['REQUEST_METHOD'], "POST") || !strcasecmp($_SERVER['REQUEST_METHOD'], "PUT")) {
+	if (isset($_SERVER['REQUEST_METHOD']) && (!strcasecmp($_SERVER['REQUEST_METHOD'], "POST") || !strcasecmp($_SERVER['REQUEST_METHOD'], "PUT"))) {
 		foreach ($_POST as $h => $v) {
+			if (is_array($v)) {
+				# Workaround, see Bug #12
+				$v = "Array";
+			}
 			$request_entity[$h] = $v;
 		}
 	}
@@ -213,10 +229,6 @@ function bb2_screen($settings, $package)
 			if ($r = bb2_post($settings, $package)) return $r;
 		}
 	}
-
-	// Last chance screening.
-	require_once(BB2_CORE . "/screener.inc.php");
-	bb2_screener($settings, $package);
 
 	// And that's about it.
 	bb2_approved($settings, $package);

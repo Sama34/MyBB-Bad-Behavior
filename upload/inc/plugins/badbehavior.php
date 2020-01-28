@@ -350,9 +350,10 @@ function badbehavior_info()
 		"website"		=> "http://www.secondversion.com/",
 		"author"		=> "SecondV",
 		"authorsite"	=> "http://www.secondversion.com/",
-		"version"		=> "1.0.1",
-		"guid"			=> "da9c0d9836a2bfa0d285e5a6273a6fc6",
-		"compatibility"	=> "16*"
+		"version"		=> "1.8.22",
+		"versioncode"	=> 1822,
+		"codename"		=> "ougc_badbehavior",
+		"compatibility"	=> "18*"
 	);
 }
 
